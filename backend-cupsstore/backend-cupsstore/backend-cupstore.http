@@ -1,6 +1,0 @@
-@backend_cupstore_HostAddress = http://localhost:5093
-
-GET {{backend_cupstore_HostAddress}}/weatherforecast/
-Accept: application/json
-
-###
