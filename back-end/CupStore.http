@@ -1,0 +1,6 @@
+@CupStore_HostAddress = http://localhost:5208
+
+GET {{CupStore_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
