@@ -1,2 +1,2 @@
-# cups-store
-I will try to dev a complete Store of Cups.
+# book-store
+I will try to dev a simple Store of Books.
