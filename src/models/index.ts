@@ -1,13 +1,13 @@
-import Employee from './Employee'
-import User from './User'
+import EmployeeModel from './db/Employee'
+import UserModel from './db/User'
 
-Employee.belongsTo(User, {
+EmployeeModel.belongsTo(UserModel, {
     foreignKey: { name: 'user_id', allowNull: false },
     as: 'user',
 })
-User.hasOne(Employee, {
+UserModel.hasOne(EmployeeModel, {
     foreignKey: 'user_id',
     as: 'employee',
 })
 
-export { User, Employee }
+export { UserModel, EmployeeModel }

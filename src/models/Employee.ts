@@ -1,40 +1,12 @@
-import {
-    DataTypes,
-    InferAttributes,
-    InferCreationAttributes,
-    Model,
-} from 'sequelize'
-import sequelize from '../database'
-import User from './User'
+import User from "./User"
 
-class Employee extends Model<
-    InferAttributes<Employee, { omit: 'user_id' | 'user' }>,
-    InferCreationAttributes<Employee>
-> {
-    declare id?: number
-    declare first_name: string
-    declare last_name: string
-    declare is_admin?: boolean
-    declare user_id: number
-    declare user?: User
+class Employee {
+    public id?: number
+    public first_name: string = ''
+    public last_name: string = ''
+    public is_admin?: boolean
+    public user_id: number = 0
+    public user?: User
 }
-
-Employee.init(
-    {
-        id: {
-            type: DataTypes.BIGINT.UNSIGNED,
-            autoIncrement: true,
-            primaryKey: true,
-        },
-        first_name: { type: DataTypes.STRING(24), allowNull: false },
-        last_name: { type: DataTypes.STRING(24), allowNull: false },
-        is_admin: { type: DataTypes.BOOLEAN, defaultValue: false },
-    },
-    {
-        tableName: 'Employee',
-        timestamps: false,
-        sequelize: sequelize,
-    },
-)
 
 export default Employee

@@ -1,56 +1,52 @@
-import {
-    DataTypes,
-    InferAttributes,
-    InferCreationAttributes,
-    Model,
-} from 'sequelize'
-import sequelize from '../database'
-import Employee from './Employee'
+import { EmployeeModel, UserModel } from '.'
+import { Create, DeleteById, GetAll, GetById, UpdateById } from '../lib'
 
-class User extends Model<
-    InferAttributes<User, { omit: 'employee' }>,
-    InferCreationAttributes<User>
-> {
-    declare id?: number
-    declare username: string
-    declare password: string
-    declare name?: string
-    declare email: string
-    declare age?: number
-    declare avatar?: string
-    declare employee?: Employee
+export interface DataUser {
+    name?: string
+    email: string
+    password: string
+    username: string
+    age?: number
+    avatar?: string
 }
 
-User.init(
-    {
-        id: {
-            type: DataTypes.BIGINT.UNSIGNED,
-            autoIncrement: true,
-            primaryKey: true,
-        },
-        username: {
-            type: DataTypes.STRING(16),
-            unique: true,
-            allowNull: false,
-        },
-        password: {
-            type: DataTypes.STRING(24),
-            allowNull: false,
-        },
-        name: DataTypes.STRING(16),
-        age: DataTypes.INTEGER,
-        avatar: DataTypes.BLOB('medium'),
-        email: {
-            type: DataTypes.STRING,
-            unique: true,
-            allowNull: false,
-        },
-    },
-    {
-        tableName: 'User',
-        timestamps: false,
-        sequelize,
-    },
-)
+class User {
+    public static create: Create<DataUser, UserModel> = async (
+        data: DataUser,
+    ) => {
+        const usersCount = await UserModel.count();
+
+        if (usersCount > 0)
+            console.log("Primeiro usuário a ser criado.")
+
+        return await UserModel.create(data)
+    }
+
+    public static getById: GetById<UserModel> = async (id: number) => {
+        return await UserModel.findByPk(id)
+    }
+
+    public static getAll: GetAll<UserModel> = async () => {
+        return await UserModel.findAll({
+            include: { model: EmployeeModel, as: 'employee' },
+        })
+    }
+
+    public static updateById: UpdateById<DataUser, UserModel> = async (
+        id: number,
+        user: DataUser,
+    ) => {
+        const [, [updatedUser]] = await UserModel.update(user, {
+            where: { id },
+            returning: true,
+        })
+        return updatedUser
+    }
+
+    public static deleteById: DeleteById = async (id: number) => {
+        await UserModel.destroy({ where: { id } })
+        return 'Usuário deletado com sucesso.'
+    }
+}
 
 export default User
