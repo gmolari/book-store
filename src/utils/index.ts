@@ -1,5 +1,5 @@
 import { ValidationErrorItem } from 'sequelize'
-import { ResponseError } from '../lib'
+import { GenericObject, ResponseError } from '../lib'
 
 type ErrorMessagesGenerator<T> = (
     errors: T[],
@@ -58,4 +58,14 @@ const validationErrorMessagesGenerator: ErrorMessagesGenerator<
     return errorMessage
 }
 
-export { validationErrorMessagesGenerator }
+function updateEntries(entries: GenericObject, currentEntries: GenericObject): GenericObject {
+    const thisEntries = { ...entries }
+
+    Object.keys(entries).forEach(key => {
+        thisEntries[key] = thisEntries[key] || currentEntries[key]
+    })
+
+    return thisEntries
+}
+
+export { validationErrorMessagesGenerator, updateEntries }

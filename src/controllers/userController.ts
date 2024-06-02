@@ -29,6 +29,45 @@ export async function createUser(req: Request, res: Response) {
     } catch (error) {
         response.message = 'Não foi possível criar o usuário.'
 
+        if (error instanceof ValidationError) {
+            response.errors = validationErrorMessagesGenerator(error.errors, {
+                username: `Nome de usuário`,
+                email: `Email`,
+                password: `Senha`,
+            })
+        }
+
+        res.status(400).send(response)
+    }
+}
+
+export async function updateUserById(req: Request, res: Response) {
+    const { name, email, password, username, age, avatar }: DataUser = req.body
+    const { id } = req.params
+
+    const response: ResponseApi<UserModel> = {
+        errors: [],
+        message: 'Usuário alterado com sucesso.',
+    }
+
+    try {
+        const data = {
+            name,
+            email,
+            password,
+            username,
+            age,
+            avatar,
+        }
+
+        const updatedUser = await User.updateById(Number(id), data)
+
+        response.data = updatedUser
+
+        res.status(200).send(response)
+    } catch (error) {
+        response.message = 'Não foi possível alterar o usuário.'
+
         console.log(error)
 
         if (error instanceof ValidationError) {

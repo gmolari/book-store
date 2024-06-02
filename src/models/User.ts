@@ -8,6 +8,7 @@ import {
     UpdateById,
 } from '../lib'
 import bcrypt from 'bcrypt'
+import { updateEntries } from '../utils'
 
 export interface DataUser {
     name?: string
@@ -22,8 +23,10 @@ class User {
     public static create: Create<DataUser, UserModel> = async (
         data: DataUser,
     ) => {
-        if (await User.firstUser())
-            console.log('Primeiro usuário a ser criado.')
+        if (await this.firstUser())
+            console.log(
+                '////////////// Primeiro usuário a ser criado. /////////////////',
+            )
 
         data.password = await bcrypt.hash(
             data.password,
@@ -54,13 +57,20 @@ class User {
 
     public static updateById: UpdateById<DataUser, UserModel> = async (
         id: number,
-        user: DataUser,
+        data: DataUser,
     ) => {
-        const [, [updatedUser]] = await UserModel.update(user, {
-            where: { id },
-            returning: true,
-        })
-        return updatedUser
+        const currentUser = await this.getById(id)
+
+        if (!currentUser) throw new Error('Usuário não encontrado.')
+
+        data.password = data.password
+            ? await bcrypt.hash(data.password, await bcrypt.genSalt(10))
+            : currentUser.password
+
+        currentUser.update(data)
+        currentUser.save()
+
+        return currentUser
     }
 
     public static deleteById: DeleteById = async (id: number) => {
