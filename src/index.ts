@@ -3,7 +3,9 @@ import dotenv from 'dotenv'
 import sequelize from './database'
 import cors from 'cors'
 import userRoutes from './routes/userRoutes'
+import authRoutes from './routes/authRoutes'
 import { UserModel, EmployeeModel } from './models'
+import authMidleware from './midlewares/authMidleware'
 dotenv.config()
 
 const app = express()
@@ -12,6 +14,9 @@ app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 app.use(cors())
 
+app.use('/auth', authRoutes)
+
+app.use(authMidleware)
 app.use('/user', userRoutes)
 
 const PORT = process.env.PORT || 3001

@@ -1,5 +1,13 @@
 import { EmployeeModel, UserModel } from '.'
-import { Create, DeleteById, GetAll, GetById, UpdateById } from '../lib'
+import {
+    BaseFilter,
+    Create,
+    DeleteById,
+    GetAll,
+    GetById,
+    UpdateById,
+} from '../lib'
+import bcrypt from 'bcrypt'
 
 export interface DataUser {
     name?: string
@@ -14,9 +22,13 @@ class User {
     public static create: Create<DataUser, UserModel> = async (
         data: DataUser,
     ) => {
-        const usersCount = await UserModel.count()
+        if (await User.firstUser())
+            console.log('Primeiro usuário a ser criado.')
 
-        if (usersCount > 0) console.log('Primeiro usuário a ser criado.')
+        data.password = await bcrypt.hash(
+            data.password,
+            await bcrypt.genSalt(10),
+        )
 
         return await UserModel.create(data, {
             include: { model: EmployeeModel, as: 'employee' },
@@ -29,8 +41,13 @@ class User {
         })
     }
 
-    public static getAll: GetAll<UserModel> = async () => {
+    public static getAll: GetAll<UserModel> = async (
+        filter: BaseFilter[] = [],
+    ) => {
         return await UserModel.findAll({
+            where: filter
+                ? Object.fromEntries(filter.map((f) => [f.filter, f.value]))
+                : {},
             include: { model: EmployeeModel, as: 'employee' },
         })
     }
@@ -49,6 +66,12 @@ class User {
     public static deleteById: DeleteById = async (id: number) => {
         await UserModel.destroy({ where: { id } })
         return 'Usuário deletado com sucesso.'
+    }
+
+    public static firstUser = async () => {
+        const users = await UserModel.count()
+        if (users > 0) return false
+        return true
     }
 }
 

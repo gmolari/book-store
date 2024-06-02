@@ -34,7 +34,7 @@ User.init(
             allowNull: false,
         },
         password: {
-            type: DataTypes.STRING(24),
+            type: DataTypes.STRING,
             allowNull: false,
         },
         name: DataTypes.STRING(16),
