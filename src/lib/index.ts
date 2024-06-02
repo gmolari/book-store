@@ -4,8 +4,13 @@ export type GetAll<T> = () => Promise<T[]>
 export type UpdateById<T1, T2> = (id: number, data: T1) => Promise<T2>
 export type DeleteById = (id: number) => Promise<string>
 
+export type ResponseError = {
+    message: string
+    field?: string
+}
+
 export type ResponseApi<T> = {
-    errors?: string[]
+    errors?: ResponseError[]
     message: string
     data?: T
 }

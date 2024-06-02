@@ -1,9 +1,10 @@
 import { ValidationErrorItem } from 'sequelize'
+import { ResponseError } from '../lib'
 
 type ErrorMessagesGenerator<T> = (
     errors: T[],
     fields: { [key: string]: string },
-) => string[]
+) => ResponseError[]
 
 const validationErrorMessagesGenerator: ErrorMessagesGenerator<
     ValidationErrorItem
@@ -11,42 +12,46 @@ const validationErrorMessagesGenerator: ErrorMessagesGenerator<
     let errorMessage = []
 
     for (const error of errors) {
-        switch (error.validatorKey) {
-            case 'is_unll':
-                errorMessage.push(
-                    `O campo '${fields[error.path as string]}' é obrigatório e não pode ser nulo.\n`,
-                )
-                break
-            case 'is_empty':
-                errorMessage.push(
-                    `O campo '${fields[error.path as string]}' não pode estar vazio.\n`,
-                )
-                break
-            case 'min':
-                errorMessage.push(
-                    `O valor do campo '${fields[error.path as string]}' deve ser maior ou igual a ${error.validatorArgs?.[0]}.\n`,
-                )
-                break
-            case 'max':
-                errorMessage.push(
-                    `O valor do campo '${fields[error.path as string]}' deve ser menor ou igual a ${error.validatorArgs?.[0]}.\n`,
-                )
-                break
-            case 'is':
-                errorMessage.push(
-                    `O valor do campo '${fields[error.path as string]}' não é válido.\n`,
-                )
-                break
-            case 'is_email':
-                errorMessage.push(
-                    `O valor do campo '${fields[error.path as string]}' deve ser um endereço de e-mail válido.\n`,
-                )
-                break
-            default:
-                errorMessage.push(
-                    `Erro de validação desconhecido no campo '${fields[error.path as string]}'.\n`,
-                )
-                break
+        if (error.validatorKey === 'is_null') {
+            errorMessage.push({
+                message: `O campo "${fields[error.path as string]}" é obrigatório e não pode ser nulo.`,
+                field: error.path as string,
+            })
+        } else if (error.validatorKey === 'is_empty') {
+            errorMessage.push({
+                message: `O campo "${fields[error.path as string]}" não pode estar vazio.`,
+                field: error.path as string,
+            })
+        } else if (error.validatorKey === 'min') {
+            errorMessage.push({
+                message: `O valor do campo "${fields[error.path as string]}" deve ser maior ou igual a ${error.validatorArgs?.[0]}.`,
+                field: error.path as string,
+            })
+        } else if (error.validatorKey === 'max') {
+            errorMessage.push({
+                message: `O valor do campo "${fields[error.path as string]}" deve ser menor ou igual a ${error.validatorArgs?.[0]}.`,
+                field: error.path as string,
+            })
+        } else if (error.validatorKey === 'is') {
+            errorMessage.push({
+                message: `O valor do campo "${fields[error.path as string]}" não é válido.`,
+                field: error.path as string,
+            })
+        } else if (error.validatorKey === 'isEmail') {
+            errorMessage.push({
+                message: `O valor do campo "${fields[error.path as string]}" deve ser um endereço de e-mail válido.`,
+                field: error.path as string,
+            })
+        } else if (error.validatorKey === 'not_unique') {
+            errorMessage.push({
+                message: `O valor do campo "${fields[error.path as string]}" já está cadastrado.`,
+                field: error.path as string,
+            })
+        } else {
+            errorMessage.push({
+                message: `Erro de validação desconhecido no campo "${fields[error.path as string]}".`,
+                field: error.path as string,
+            })
         }
     }
 

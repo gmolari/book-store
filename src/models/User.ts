@@ -14,16 +14,19 @@ class User {
     public static create: Create<DataUser, UserModel> = async (
         data: DataUser,
     ) => {
-        const usersCount = await UserModel.count();
+        const usersCount = await UserModel.count()
 
-        if (usersCount > 0)
-            console.log("Primeiro usuário a ser criado.")
+        if (usersCount > 0) console.log('Primeiro usuário a ser criado.')
 
-        return await UserModel.create(data)
+        return await UserModel.create(data, {
+            include: { model: EmployeeModel, as: 'employee' },
+        })
     }
 
     public static getById: GetById<UserModel> = async (id: number) => {
-        return await UserModel.findByPk(id)
+        return await UserModel.findByPk(id, {
+            include: { model: EmployeeModel, as: 'employee' },
+        })
     }
 
     public static getAll: GetAll<UserModel> = async () => {

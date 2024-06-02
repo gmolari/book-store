@@ -29,14 +29,14 @@ export async function createUser(req: Request, res: Response) {
     } catch (error) {
         response.message = 'Não foi possível criar o usuário.'
 
+        console.log(error)
+
         if (error instanceof ValidationError) {
             response.errors = validationErrorMessagesGenerator(error.errors, {
-                username: `"Nome de usuário"`,
-                email: `"Email"`,
-                password: `"Senha"`,
+                username: `Nome de usuário`,
+                email: `Email`,
+                password: `Senha`,
             })
-        } else {
-            console.log(error)
         }
 
         res.status(400).send(response)
@@ -55,6 +55,43 @@ export async function getAllUsers(req: Request, res: Response) {
     } catch (error) {
         response.errors = []
         response.message = 'Não foi possível encontrar usuários.'
+        res.status(200).send(response)
+    }
+}
+
+export async function deleteUserById(req: Request, res: Response) {
+    const { id } = req.params
+
+    const response: ResponseApi<UserModel> = {
+        errors: [],
+        message: 'Usuário deletado com sucesso.',
+    }
+
+    try {
+        await User.deleteById(Number(id))
+        res.status(200).send(response)
+    } catch (error) {
+        response.errors = []
+        response.message = 'Não foi possível deletar usuário.'
+        res.status(200).send(response)
+    }
+}
+
+export async function getUserById(req: Request, res: Response) {
+    const { id } = req.params
+
+    const response: ResponseApi<UserModel> = {
+        errors: [],
+        message: 'Usuário encontrado com sucesso.',
+    }
+
+    try {
+        const user = await User.getById(Number(id))
+        response.data = user as UserModel
+        res.status(200).send(response)
+    } catch (error) {
+        response.errors = []
+        response.message = 'Não foi possível encontrar usuário.'
         res.status(200).send(response)
     }
 }
