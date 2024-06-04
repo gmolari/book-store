@@ -8,7 +8,6 @@ import {
     UpdateById,
 } from '../lib'
 import bcrypt from 'bcrypt'
-import { updateEntries } from '../utils'
 
 export interface DataUser {
     name?: string
