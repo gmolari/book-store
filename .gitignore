@@ -1,3 +1,18 @@
+node_modules
+dist
+dist-ssr
+*.local
+.env
+
+# Editor directories and files
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
 *.psd
 
 ### Node ###
@@ -141,3 +156,4 @@ dist
 .svelte-kit
 
 # End of https://www.toptal.com/developers/gitignore/api/node
+
