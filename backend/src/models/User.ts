@@ -19,18 +19,36 @@ export interface DataUser {
 }
 
 class User {
-    public static create: Create<DataUser, UserModel> = async (
-        data: DataUser,
-    ) => {
-        if (await this.firstUser())
-            console.log(
-                '////////////// Primeiro usuário a ser criado. /////////////////',
-            )
+    public static create: Create<
+        DataUser,
+        UserModel | { user: UserModel; employee: EmployeeModel }
+    > = async (data: DataUser) => {
+        let isFirstUser = await this.firstUser()
 
         data.password = await bcrypt.hash(
             data.password,
             await bcrypt.genSalt(10),
         )
+
+        if (isFirstUser) {
+            const firstUser = await UserModel.create(data, {
+                include: { model: EmployeeModel, as: 'employee' },
+            })
+
+            const firstEmployee = await EmployeeModel.create(
+                {
+                    first_name: (data.name || data.username || ''),
+                    last_name: '',
+                    user_id: firstUser.id as number,
+                    is_admin: true,
+                },
+                { include: { model: UserModel, as: 'user' } },
+            )
+
+            // firstUser.save()
+
+            return { user: firstUser, employee: firstEmployee }
+        }
 
         return await UserModel.create(data, {
             include: { model: EmployeeModel, as: 'employee' },

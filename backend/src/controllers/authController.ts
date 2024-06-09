@@ -62,10 +62,22 @@ const register = async (req: Request, res: Response) => {
             username,
             age,
             avatar,
+        }).catch(async (err) => {
+            await User.deleteById(
+                (user instanceof UserModel ? user.id : user.user.id) as number,
+            ).catch(err => {throw err})
+
+            throw err
         })
 
         const token = jwt.sign(
-            { id: user.id, username: user.username },
+            {
+                id: user instanceof UserModel ? user.id : user.user.id,
+                username:
+                    user instanceof UserModel
+                        ? user.username
+                        : user.user.username,
+            },
             process.env.JWT_SECRET as string,
             { expiresIn: '1h' },
         )

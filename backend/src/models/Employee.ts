@@ -7,8 +7,6 @@ import {
     GetById,
     UpdateById,
 } from '../lib'
-import { DataUser } from './User'
-import User from './db/User'
 
 export interface DataEmployee {
     first_name: string
