@@ -4,7 +4,7 @@ import sequelize from './database'
 import cors from 'cors'
 import userRoutes from './routes/userRoutes'
 import authRoutes from './routes/authRoutes'
-import { UserModel, EmployeeModel } from './models'
+import { UserModel, EmployeeModel, CategoryModel, BookModel } from './models'
 import authMidleware from './midlewares/authMidleware'
 dotenv.config()
 
@@ -32,5 +32,7 @@ async function syncDatabase(): Promise<string> {
     await sequelize.sync()
     await UserModel.sync()
     await EmployeeModel.sync()
+    await CategoryModel.sync()
+    await BookModel.sync()
     return 'Database synchronized successfully'
 }
